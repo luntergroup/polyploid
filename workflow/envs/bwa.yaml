@@ -1,0 +1,9 @@
+name: bwa
+channels:
+    - bioconda
+    - conda-forge
+    - defaults
+dependencies:
+    - tabix=0.2.6
+    - samtools=1.11
+    - bwa=0.7.17

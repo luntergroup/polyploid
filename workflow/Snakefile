@@ -1,0 +1,19 @@
+include: "rules/data.smk"
+include: "rules/utils.smk"
+include: "rules/mapping.smk"
+include: "rules/octopus.smk"
+include: "rules/gatk.smk"
+include: "rules/freebayes.smk"
+include: "rules/evaluate.smk"
+
+rule all:
+	input:
+		expand("results/eval/{sample}.{library}.{depth}x.{reference}.{mapper}.{caller}.{filter}.{match}.vcfeval", \
+			  sample='+'.join(config["samples"]), \
+              library=config["library"], \
+              depth=config["depths"], \
+              reference=config["reference"], \
+              mapper=config["mapper"], \
+              caller=config["callers"], \
+              filter=["pass", "raw"], \
+              match=["GT", "AL"])

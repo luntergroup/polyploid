@@ -1,0 +1,10 @@
+name: gatk4
+channels:
+    - bioconda
+    - conda-forge
+    - defaults
+dependencies:
+    - tabix=0.2.6
+    - bcftools=1.11
+    - gatk4=4.1.9.0
+    - python=3.9.0

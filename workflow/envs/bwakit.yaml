@@ -1,0 +1,7 @@
+name: bwakit
+channels:
+    - bioconda
+    - conda-forge
+    - defaults
+dependencies:
+    - bwakit=0.7.17.dev1
