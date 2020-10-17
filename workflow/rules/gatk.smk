@@ -8,6 +8,8 @@ rule gatk_create_sequence_dictionary:
 	shell:
 		"gatk CreateSequenceDictionary -R {input}"
 
+localrules: gatk_create_sequence_dictionary
+
 rule gatk_mark_duplicates:
 	input:
 		bam="data/reads/mapped/{sample}.{library}.{depth}x.{reference}.{mapper}.bam",

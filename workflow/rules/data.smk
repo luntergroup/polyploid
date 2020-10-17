@@ -34,6 +34,8 @@ rule generate_GRCh38_chromosomes_bed:
 	shell:
 		"head -23 {input} | awk -v OFS='\t' '{{print $1,0,$2}}' > {output}"
 
+localrules: download_hs38DH, download_GRCh38, generate_hs38DH_chromosomes_bed, generate_GRCh38_chromosomes_bed
+
 import re
 
 rule download_giab:
@@ -51,6 +53,8 @@ rule download_giab:
 		curl -o {output.vcf_index} {params.url_prefix}/{wildcards.sample}_GRCh38_1_22_v4.2_benchmark.vcf.gz.tbi
 		curl -o {output.bed} {params.url_prefix}/{wildcards.sample}_GRCh38_1_22_v4.2_benchmark.bed
 		"""
+		
+localrules: download_giab
 
 MAX_DEPTH = str(int(config["sample_depth"]) * len(config["samples"]))
 MIXED_SAMPLE = '+'.join(config["samples"])
@@ -62,6 +66,8 @@ rule mix_paired_reads:
 		"data/reads/raw/" + MIXED_SAMPLE + ".{library}." + MAX_DEPTH + "x.{strand}.fastq.gz"
 	shell:
 		"cat {input} > {output}"
+
+localrules: mix_paired_reads
 
 rule downsample_fastq:
 	input:
@@ -100,6 +106,8 @@ rule make_truth_vcf:
 		 -o - | \
 		rtg vcfsubset -i - --keep-sample TRUTH -o {output.vcf}"
 
+localrules: make_truth_vcf
+
 rule make_truth_bed:
 	input:
 		expand("data/truth/{sample}.{{reference}}.bed", sample=config["samples"])
@@ -109,3 +117,5 @@ rule make_truth_bed:
 		"../envs/bedtools.yaml"
 	shell:
 		"bedtools multiinter -i {input} | cut -f 1,2,3 > {output}"
+
+localrules: make_truth_bed

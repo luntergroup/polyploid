@@ -13,6 +13,8 @@ rule bwa_index:
 	shell:
 		"bwa index {input.fa}"
 
+localrules: bwa_index
+
 rule bwa_map:
 	input:
 		rules.bwa_index.output,
@@ -65,3 +67,5 @@ rule samtools_index_bam:
 		"../envs/samtools.yaml"
 	shell:
 		"samtools index {input}"
+
+localrules: samtools_index_bam

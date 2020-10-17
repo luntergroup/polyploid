@@ -8,6 +8,8 @@ rule samtools_index_fasta:
 	shell:
 		"samtools faidx {fasta}"
 
+localrules: samtools_index_fasta
+
 rule rtg_format:
 	input:
 		"{prefix}.fa"
@@ -17,3 +19,5 @@ rule rtg_format:
 		"../envs/rtg.yaml"
 	shell:
 		"rtg format {input} -o {output}"
+
+localrules: rtg_format

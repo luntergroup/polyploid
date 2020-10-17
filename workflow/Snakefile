@@ -6,6 +6,8 @@ include: "rules/gatk.smk"
 include: "rules/freebayes.smk"
 include: "rules/evaluate.smk"
 
+localrules: all
+
 rule all:
 	input:
 		expand("results/eval/{sample}.{library}.{depth}x.{reference}.{mapper}.{caller}.{filter}.{match}.vcfeval", \
