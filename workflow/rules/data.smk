@@ -89,8 +89,8 @@ rule downsample_paired_fastq:
 	conda:
 		"../envs/seqtk.yaml"
 	shell:
-		"seqtk sample {input} \
-		 <(bc<<<'scale=10; {wildcards.depth}/{params.max_depth}') \
+		"bc<<<'scale=10; {wildcards.depth}/{params.max_depth}' | \
+		 xargs -I{{}} seqtk sample {input} {{}} \
 		 | gzip > {output}"
 
 rule downsample_fastq:
