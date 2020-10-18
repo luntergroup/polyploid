@@ -45,7 +45,8 @@ rule gatk_call:
 		vcf="results/calls/{sample}.{library}.{depth}x.{reference}.{mapper}.GATK4.raw.vcf.gz",
 		vcf_index="results/calls/{sample}.{library}.{depth}x.{reference}.{mapper}.GATK4.raw.vcf.gz.tbi"
 	params:
-		ploidy=config["sample_ploidy"]*len(config["samples"])
+		ploidy=config["sample_ploidy"]*len(config["samples"]),
+		other=config["caller_options"]["GATK4"]
 	benchmark:
 		"results/benchmarks/gatk/{sample}.{library}.{depth}x.{reference}.{mapper}.tsv"
 	threads: 20
@@ -58,7 +59,8 @@ rule gatk_call:
 			-L {input.bed} \
 			-O {output.vcf} \
 			--sample-ploidy {params.ploidy} \
-			--threads {threads}"
+			--threads {threads} \
+			{params.other}"
 
 rule gatk_filter:
 	input:

@@ -69,7 +69,17 @@ rule mix_paired_reads:
 
 localrules: mix_paired_reads
 
-rule downsample_fastq:
+rule mix_reads:
+	input:
+		expand("data/reads/raw/{sample}.{{library}}." + str(config["sample_depth"]) + "x.fastq.gz", sample=config["samples"])
+	output:
+		"data/reads/raw/" + MIXED_SAMPLE + ".{library}." + MAX_DEPTH + "x.fastq.gz"
+	shell:
+		"cat {input} > {output}"
+
+localrules: mix_reads
+
+rule downsample_paired_fastq:
 	input:
 		rules.mix_paired_reads.output
 	output:
@@ -83,6 +93,20 @@ rule downsample_fastq:
 		 <(bc<<<'scale=10; {wildcards.depth}/{params.max_depth}') \
 		 | gzip > {output}"
 
+rule downsample_fastq:
+	input:
+		rules.mix_reads.output
+	output:
+		"data/reads/raw/" + MIXED_SAMPLE + ".{library}.{depth}x.fastq.gz"
+	params:
+		max_depth=MAX_DEPTH
+	conda:
+		"../envs/seqtk.yaml"
+	shell:
+		"seqtk sample {input} \
+		 <(bc<<<'scale=10; {wildcards.depth}/{params.max_depth}') \
+		 | gzip > {output}"
+		 
 def read_sample_name(vcf_filename):
 	return ps.VariantFile(vcf_filename).header.samples[0]
 

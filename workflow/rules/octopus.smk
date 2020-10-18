@@ -9,8 +9,7 @@ rule octopus_call:
 		vcf_index="results/calls/{sample}.{library}.{depth}x.{reference}.{mapper}.Octopus.vcf.gz.tbi"
 	params:
 		ploidy=config["sample_ploidy"]*len(config["samples"]),
-		forest="germline.v0.7.0.forest",
-		max_genotypes=20000,
+		other=config["caller_options"]["Octopus"]
 	log:
 		"logs/octopus/{sample}.{library}.{depth}x.{reference}.{mapper}.log"
 	benchmark:
@@ -23,8 +22,6 @@ rule octopus_call:
 		 -t {input.bed} \
 		 -o {output.vcf} \
 		 -P {params.ploidy} \
-		 --forest {params.forest} \
 		 --threads {threads}) \
-		 --max-genotypes {params.max_genotypes} \
-		 --disable-early-phase-detection \
+		 {params.other} \
 		 2> {log}"

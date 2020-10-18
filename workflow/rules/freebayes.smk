@@ -9,7 +9,8 @@ rule freebayes_call:
 		vcf_index="results/calls/{sample}.{library}.{depth}x.{reference}.{mapper}.FreeBayes.vcf.gz.tbi"
 	params:
 		ploidy=config["sample_ploidy"]*len(config["samples"]),
-		chunk_size=50000000
+		chunk_size=50000000,
+		other=config["caller_options"]["FreeBayes"]
 	log:
 		"logs/freebayes/{sample}.{library}.{depth}x.{reference}.{mapper}.log"
 	benchmark:
@@ -23,7 +24,7 @@ rule freebayes_call:
 			 -f {input.reference} \
 			 -b {input.bam} \
 			 --ploidy {params.ploidy} \
-			 -= | \
+			 {params.other} | \
 		bcftools filter \
 			 -i 'QUAL > 1 & GQ > 1 & SAF > 0 & SAR > 0' \
 			 -s FAIL \
