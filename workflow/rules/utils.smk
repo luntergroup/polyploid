@@ -6,7 +6,7 @@ rule samtools_index_fasta:
 	conda:
 		"../envs/samtools.yaml"
 	shell:
-		"samtools faidx {fasta}"
+		"samtools faidx {input}"
 
 localrules: samtools_index_fasta
 
