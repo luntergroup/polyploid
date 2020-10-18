@@ -22,6 +22,6 @@ rule octopus_call:
 		 -t {input.bed} \
 		 -o {output.vcf} \
 		 -P {params.ploidy} \
-		 --threads {threads}
+		 --threads {threads} \
 		 {params.other}) \
 		 2> {log}"
