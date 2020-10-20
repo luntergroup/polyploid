@@ -3,22 +3,22 @@ Benchmarking variant calling in polyploids
 
 ### Running experiments
 
-All experiments are reproducable using Snakemake workflows. First clone the repository:
+All experiments are reproducable using a Snakemake workflow. First clone the repository:
 
 ```shell
 $ git clone https://github.com/luntergroup/polyploid && cd polyploid
 ```
 
-Next you will need to install Conda if not already installed:
+You will need to install Conda, if not already:
 
 ```shell
 $ wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-$ bash Miniconda3-latest-Linux-x86_64.sh
-# then follow instructions and activate conda wherever you install it, e.g.
-$ source ~/.bashrc
+$ bash Miniconda3-latest-Linux-x86_64.sh # follow instructions, answer 'yes' where asked
+$ source ~/.bashrc # assuming you installed conda into your home directory
+$ conda update conda
 ```
 
-Next install Snakemake and pysam with conda:
+Install Snakemake and general dependencies with conda:
 
 ```shell
 $ conda config --add channels defaults
