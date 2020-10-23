@@ -6,6 +6,8 @@ import pysam as ps
 import subprocess as sp
 from pathlib import Path
 
+rtg_bin = Path("rtg") 
+
 def run_vcfeval(ref_sdf, 
 				baseline_vcf, 
 				call_vcf, 
@@ -23,7 +25,7 @@ def run_vcfeval(ref_sdf,
 				flag_alternates=False,
 				threads=None,
 				memory=None):
-	cmd = ['rtg']
+	cmd = [rtg_bin]
 	if memory is not None:
 		cmd.append('RTG_MEM=' + memory)
 	cmd += ['vcfeval', '-t', ref_sdf, '-b', baseline_vcf, '-c', call_vcf, '-o', out_dir]
@@ -122,6 +124,8 @@ def vcfeval_alleles_helper(ref, baseline, calls, out, bed_regions=None, evaluati
 		summarywriter.writerow(["None", str(tp_baseline), str(tp), str(fp), str(fn), str(precision), str(sensitivity), str(f_measure)])
 
 def main(args):
+    global rtg_bin
+    rtg_bin = args.rtg
     if args.squash_ploidy and args.output_mode == "split":
         vcfeval_alleles_helper(args.sdf, args.baseline, args.calls, args.output, \
                     bed_regions=args.bed_regions, \
@@ -206,5 +210,9 @@ if __name__ == '__main__':
                         default=False,
                         action='store_true',
                         help='Decompose multi-allelic and complex alleles')
+    parser.add_argument('--rtg',
+                        type=Path,
+                        default=Path("rtg"),
+                        help="RTG Tools binary")
     parsed, unparsed = parser.parse_known_args()
     main(parsed)

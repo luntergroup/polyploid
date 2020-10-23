@@ -15,7 +15,8 @@ rule vcfeval:
 		squash_ploidy=lambda wildcards: "--squash-ploidy" if wildcards.match=="AL" else "",
 		decompose=lambda wildcards: "--decompose" if wildcards.match=="AL" else "",
 		output_mode="split",
-		memory="40g"
+		memory="40g",
+                rtg="workflow/tools/rtg-tools/rtg"
 	threads: 20
 	conda:
 		"../envs/rtg.yaml"
@@ -34,7 +35,8 @@ rule vcfeval:
 			--memory {params.memory} \
 			{params.all_records} \
 			{params.squash_ploidy} \
-			{params.decompose}"
+			{params.decompose} \
+			--rtg {params.rtg}"
 
 rule install_starfish:
 	output:
