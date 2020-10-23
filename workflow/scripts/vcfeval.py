@@ -23,10 +23,10 @@ def run_vcfeval(ref_sdf,
 				flag_alternates=False,
 				threads=None,
 				memory=None):
-	cmd = ['rtg', 'vcfeval']
+	cmd = ['rtg']
 	if memory is not None:
 		cmd.append('RTG_MEM=' + memory)
-	cmd += ['-t', ref_sdf, '-b', baseline_vcf, '-c', call_vcf, '-o', out_dir]
+	cmd += ['vcfeval', '-t', ref_sdf, '-b', baseline_vcf, '-c', call_vcf, '-o', out_dir]
 	if bed_regions is not None:
 		cmd += ['--bed-regions', bed_regions]
 	if evaluation_regions is not None:
