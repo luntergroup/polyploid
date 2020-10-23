@@ -1,4 +1,5 @@
-rule bwa_index: input:
+rule bwa_index:
+	input:
 		fa="data/references/{reference}.fa",
 		fai="data/references/{reference}.fa.fai"
 	output:
