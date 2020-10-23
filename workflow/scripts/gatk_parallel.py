@@ -50,7 +50,7 @@ def main(args):
     sp.call(['tabix', args.output])
     for tmp_vcf in tmp_vcfs:
         remove_vcf(tmp_vcf)
-    tmp_dir.unlink()
+    tmp_dir.rmdir()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
