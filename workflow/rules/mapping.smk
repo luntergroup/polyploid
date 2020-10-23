@@ -1,5 +1,4 @@
-rule bwa_index:
-	input:
+rule bwa_index: input:
 		fa="data/references/{reference}.fa",
 		fai="data/references/{reference}.fa.fai"
 	output:
@@ -25,7 +24,8 @@ rule bwa_map:
 	output:
 		"data/reads/mapped/{sample}.{library}.{depth}x.{reference}.bwa.bam"
 	params:
-		rg=r"@RG\tID:{sample}\tSM:{sample}\tLB:{library}\tPU:Illumina"
+		rg=r"@RG\tID:{sample}\tSM:{sample}\tLB:{library}\tPU:Illumina",
+		sort_memory_per_thread="4G"
 	log:
 		"logs/bwa/{sample}.{library}.{depth}x.{reference}.log"
 	threads: 20
@@ -34,7 +34,7 @@ rule bwa_map:
 	shell:
 		"(bwa mem -t {threads} -R '{params.rg}' {input.fa} {input.fq1} {input.fq2} | \
 		  samtools view -bh | \
-		  samtools sort -@ {threads} -o {output}) \
+		  samtools sort -@ {threads} -m {params.sort_memory_per_thread} -o {output}) \
 		 2> {log}"
 
 rule pbmm2_map:
