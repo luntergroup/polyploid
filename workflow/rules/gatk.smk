@@ -47,20 +47,23 @@ rule gatk_call:
 	params:
 		ploidy=config["sample_ploidy"]*len(config["samples"]),
 		other=config["caller_options"]["GATK4"]
+	log:
+		"logs/gatk/{sample}.{library}.{depth}x.{reference}.{mapper}.dedup.raw.log"
 	benchmark:
 		"results/benchmarks/gatk/{sample}.{library}.{depth}x.{reference}.{mapper}.tsv"
 	threads: 20
 	conda:
 		"../envs/gatk4.yaml"
 	shell:
-		"workflow/scripts/gatk_parallel.py \
+		"(workflow/scripts/gatk_parallel.py \
 			-R {input.reference} \
 			-I {input.bam} \
 			-L {input.bed} \
 			-O {output.vcf} \
 			--sample-ploidy {params.ploidy} \
 			--threads {threads} \
-			{params.other}"
+			{params.other}) \
+			2> {log}"
 
 rule gatk_filter:
 	input:
@@ -70,7 +73,7 @@ rule gatk_filter:
 		vcf="results/calls/{sample}.{library}.{depth}x.{reference}.{mapper}.GATK4.vcf.gz",
 		vcf_index="results/calls/{sample}.{library}.{depth}x.{reference}.{mapper}.GATK4.vcf.gz.tbi"
 	log:
-		"logs/gatk/{sample}.{library}.{depth}x.{reference}.{mapper}.filter.log"
+		"logs/gatk/{sample}.{library}.{depth}x.{reference}.{mapper}.dedup.raw.filter.log"
 	benchmark:
 		"results/benchmarks/gatk/{sample}.{library}.{depth}x.{reference}.{mapper}.filter.tsv"
 	conda:
