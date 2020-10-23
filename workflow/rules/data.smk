@@ -1,3 +1,7 @@
+from pathlib import Path
+import shutil
+import wget
+
 rule download_hs38DH:
 	output:
 		"data/references/hs38DH.fa",
@@ -18,6 +22,16 @@ rule download_GRCh38:
 	shell:
 		"curl {params.url} | gzip -d > {output}"
 
+rule download_musa_acuminata_fasta:
+	output:
+		"data/references/musa_acuminata.fa"
+	params:
+		url = "https://banana-genome-hub.southgreen.fr/sites/banana-genome-hub.southgreen.fr/files/data/fasta/version2/musa_acuminata_v2_pseudochromosome.fna"
+	shell:
+		"curl -o {output} {params.url}"
+
+localrules: download_musa_acuminata_fasta
+
 rule generate_hs38DH_chromosomes_bed:
 	input:
 		"data/references/hs38DH.fa.fai"
@@ -36,6 +50,16 @@ rule generate_GRCh38_chromosomes_bed:
 
 localrules: download_hs38DH, download_GRCh38, generate_hs38DH_chromosomes_bed, generate_GRCh38_chromosomes_bed
 
+rule generate_musa_acuminata_bed:
+	input:
+		"data/references/musa_acuminata.fa.fai"
+	output:
+		"data/references/musa_acuminata.chromosomes.bed"
+	shell:
+		"head -11 {input} | awk -v OFS='\t' '{{print $1,0,$2}}' > {output}"
+
+localrules: generate_musa_acuminata_bed
+
 import re
 
 rule download_giab:
@@ -44,7 +68,7 @@ rule download_giab:
 		vcf_index="data/truth/{sample}.{reference}.vcf.gz.tbi",
 		bed="data/truth/{sample}.{reference}.bed"
 	wildcard_constraints:
-		sample='|'.join([re.escape(s) for s in config["samples"]])
+		sample='|'.join([re.escape(s) for s in ["HG002", "HG003", "HG004"]])
 	params:
 		url_prefix="ftp://ftp-trace.ncbi.nlm.nih.gov//giab/ftp/data/AshkenazimTrio/analysis/NIST_v4.2_SmallVariantDraftBenchmark_07092020"
 	shell:
@@ -53,11 +77,85 @@ rule download_giab:
 		curl -o {output.vcf_index} {params.url_prefix}/{wildcards.sample}_GRCh38_1_22_v4.2_benchmark.vcf.gz.tbi
 		curl -o {output.bed} {params.url_prefix}/{wildcards.sample}_GRCh38_1_22_v4.2_benchmark.bed
 		"""
-		
+
 localrules: download_giab
 
+def try_get_link(config, sample, strand=None):
+	try:
+		if strand is None:
+			return config["links"][sample]
+		else:
+			return config["links"][sample][strand]
+	except:
+		return None
+
+rule download_novaseq_precision_fda_reads:
+	output:
+		"data/reads/raw/{sample}.NovaSeq.35x.{strand}.fastq.gz"
+	wildcard_constraints:
+		sample='|'.join([re.escape(s) for s in ["HG002", "HG003", "HG004"]])
+	params:
+		url=lambda wildcards: try_get_link(config, wildcards.sample, wildcards.strand)
+	shell:
+		"curl -O {output} {params.url}"
+
+localrules: download_novaseq_precision_fda_reads
+
+rule download_pacbio_precision_fda_reads:
+	output:
+		"data/reads/raw/{sample}.PacBioHiFi.35x.fastq.gz"
+	wildcard_constraints:
+		sample='|'.join([re.escape(s) for s in ["HG002", "HG003", "HG004"]])
+	params:
+		url=lambda wildcards: try_get_link(config, wildcards.sample)
+	shell:
+		"curl -O {output} {params.url}"
+
+localrules: download_pacbio_precision_fda_reads
+
+def download_ftp(link, save_path):
+	wget.download(link, out=str(save_path))
+
+def cat_files(source_filenames, destination_filename):
+	with destination_filename.open('wb') as destination:
+		for source_filename in source_filenames:
+			shutil.copyfileobj(source_filename.open('rb'), destination)
+
+def download_ena(bucket_url, run_accessions, strand, output):
+	tmp_fastqs = []
+	for run_accession, d in run_accessions:
+		link_prefix = bucket_url + "/" + d + "/" + run_accession + '/' + run_accession + "_"
+		temp_fastq = output.parent / (run_accession + ".R" + strand + ".fastq.gz")
+		download_ftp(link_prefix + strand + ".fastq.gz", temp_fastq)
+		tmp_fastqs.append(temp_fastq)
+	cat_files(tmp_fastqs, output)
+ 	for fq in tmp_fastqs:
+		fq.unlink()
+
+rule download_banana_hiseq_reads:
+	output:
+		"data/reads/raw/banana.HiSeq.55x.{strand}.fastq.gz"
+	params:
+		bucket_url = "ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR341",
+		run_accessions = [("ERR3412983", "003"), ("ERR3412984", "004")],
+		strand = lambda wildcards: wildcards.strand[-1:]
+	run:
+		download_ena(params.bucket_url, params.run_accessions, params.strand, Path(output[0]))
+
+rule download_banana_nextseq_reads:
+	output:
+		"data/reads/raw/banana.NextSeq.55x.{strand}.fastq.gz"
+	params:
+		bucket_url = "ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR341",
+		run_accessions = [("ERR3413471", "001"), ("ERR3413472", "002"), ("ERR3413473", "003"), ("ERR3413474", "004")],
+		strand = lambda wildcards: wildcards.strand[-1:]
+	run:
+		download_ena(params.bucket_url, params.run_accessions, params.strand, Path(output[0]))
+
+localrules: download_banana_hiseq_reads, download_banana_nextseq_reads
+
 MAX_DEPTH = str(int(config["sample_depth"]) * len(config["samples"]))
-MIXED_SAMPLE = '+'.join(config["samples"])
+MIXED_SAMPLE = '+'.join(config["samples"]) if len(config["samples"]) > 1 else "DUMMY"
 
 rule mix_paired_reads:
 	input:
@@ -106,7 +204,7 @@ rule downsample_fastq:
 		"seqtk sample {input} \
 		 <(bc<<<'scale=10; {wildcards.depth}/{params.max_depth}') \
 		 | gzip > {output}"
-		 
+
 def read_sample_name(vcf_filename):
 	return ps.VariantFile(vcf_filename).header.samples[0]
 

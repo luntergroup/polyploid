@@ -35,3 +35,40 @@ rule vcfeval:
 			{params.all_records} \
 			{params.squash_ploidy} \
 			{params.decompose}"
+
+rule install_starfish:
+	output:
+		"workflow/scripts/starfish.py"
+	shell:
+		"""
+		rm -rf starfish || 1
+		git clone https://github.com/dancooke/starfish
+		mv starfish/starfish.py {output}
+		rm -rf starfish
+		"""
+
+rule starfish:
+	input:
+		starfish="workflow/scripts/starfish.py",
+		reference="data/references/{reference}.sdf",
+		calls=expand("results/calls/{{sample}}.{{library}}.{{depth}}x.{{reference}}.{{mapper}}.{caller}.vcf.gz", caller=config["callers"])
+	output:
+		"results/eval/{sample}.{library}.{depth}x.{reference}.{mapper}.{filter}.{match}.isec"
+	params:
+		ploidy=config["sample_ploidy"]*len(config["samples"]),
+		all_records=lambda wildcards: "--all-records" if wildcards.filter=="raw" else "",
+		squash_ploidy=lambda wildcards: "--squash-ploidy" if wildcards.match=="AL" else "",
+		decompose=lambda wildcards: "--decompose" if wildcards.match=="AL" else ""
+	conda:
+		"../envs/rtg.yaml"
+	shell:
+		"{input.starfish} \
+		 -t {input.reference} \
+		 -V {input.calls} \
+		 -O {output} \
+		 --ref-overlap \
+		 --ploidy {params.ploidy} \
+		 --threads {threads} \
+		 {params.all_records} \
+		 {params.squash_ploidy} \
+		 {params.decompose}"

@@ -8,14 +8,17 @@ include: "rules/evaluate.smk"
 
 localrules: all
 
+BANANA = config["samples"][0] == "banana"
+
 rule all:
 	input:
-		expand("results/eval/{sample}.{library}.{depth}x.{reference}.{mapper}.{caller}.{filter}.{match}.vcfeval", \
+		expand("results/eval/{sample}.{library}.{depth}x.{reference}.{mapper}{caller}.{filter}.{match}.{eval}", \
 			  sample='+'.join(config["samples"]), \
               library=config["library"], \
               depth=config["depths"], \
               reference=config["reference"], \
               mapper=config["mapper"], \
-              caller=config["callers"], \
+              caller=[""] if BANANA else ["." + caller for caller in config["callers"]], \
               filter=["pass", "raw"], \
-              match=["GT", "AL"])
+              match=["GT", "AL"], \
+			  eval=["isec"] if BANANA else ["vcfeval"])
