@@ -104,6 +104,15 @@ def count_records(vcf_filename):
     vcf = ps.VariantFile(vcf_filename, 'r')
     return sum(1 for rec in vcf)
 
+def remove_vcf_index(vcf_filename):
+    vcf_index_filaneme = vcf_filename.with_suffix(vcf_filename.suffix + '.tbi')
+    vcf_index_filaneme.unlink()
+
+def remove_vcf(vcf_filename, index=True):
+    vcf_filename.unlink()
+    if index and vcf_index_exists(vcf_filename):
+        remove_vcf_index(vcf_filename)
+
 def vcfeval_alleles_helper(ref, baseline, calls, out, bed_regions=None, evaluation_regions=None, sample=None, ploidy=None, all_records=False, decompose=False, threads=None, memory=None):
 	normed_calls = calls.with_suffix('.norm.tmp.vcf.gz')
 	decompose_multiallelic(calls, normed_calls)
