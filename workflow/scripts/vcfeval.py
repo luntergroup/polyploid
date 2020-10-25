@@ -104,6 +104,10 @@ def count_records(vcf_filename):
     vcf = ps.VariantFile(vcf_filename, 'r')
     return sum(1 for rec in vcf)
 
+def vcf_index_exists(vcf_filename):
+    vcf_index_filaneme = vcf_filename.with_suffix(vcf_filename.suffix + '.tbi')
+    return vcf_index_filaneme.exists()
+
 def remove_vcf_index(vcf_filename):
     vcf_index_filaneme = vcf_filename.with_suffix(vcf_filename.suffix + '.tbi')
     vcf_index_filaneme.unlink()
