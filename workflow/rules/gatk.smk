@@ -21,8 +21,8 @@ rule gatk_mark_duplicates:
 	log:
 		"logs/gatk/{sample}.{library}.{depth}x.{reference}.{mapper}.dedup.log"
 	benchmark:
-		"benchmarks/gatk/{sample}.{library}.{depth}x.{reference}.{mapper}.dedup.tsv",
-        threads: 2
+		"benchmarks/gatk/{sample}.{library}.{depth}x.{reference}.{mapper}.dedup.tsv"
+	threads: 2
 	conda:
 		"../envs/gatk4.yaml"
 	shell:
