@@ -84,7 +84,7 @@ rule gatk_filter:
 		 --java-options '-Xmx4g -XX:ParallelGCThreads=1' \
 		 VariantFiltration \
 		 -V {input.vcf} \
-		 -O {output.vcf}) \
+		 -O {output.vcf} \
 		 -filter 'QD < 2.0' --filter-name 'QD2' \
 		 -filter 'QUAL < 50' --filter-name 'Q50' \
 		 -filter 'GQ < 5' --filter-name 'GQ5' \
@@ -92,5 +92,5 @@ rule gatk_filter:
 		 -filter 'SOR > 3.0' --filter-name 'SOR3' \
 		 -filter 'MQ < 40.0' --filter-name 'MQ40' \
 		 -filter 'MQRankSum < -12.5' --filter-name 'MQRankSum-12.5' \
-		 -filter 'ReadPosRankSum < -8.0' --filter-name 'ReadPosRankSum-8' \
+		 -filter 'ReadPosRankSum < -8.0' --filter-name 'ReadPosRankSum-8') \
 		 2> {log}"
