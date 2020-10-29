@@ -16,7 +16,7 @@ rule vcfeval:
 		decompose=lambda wildcards: "--decompose" if wildcards.match=="AL" else "",
 		output_mode="split",
 		memory="40g",
-                rtg="workflow/tools/rtg-tools/rtg"
+		rtg="workflow/tools/rtg-tools/rtg"
 	threads: 20
 	conda:
 		"../envs/rtg.yaml"

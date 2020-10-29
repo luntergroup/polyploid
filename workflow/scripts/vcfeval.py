@@ -9,22 +9,22 @@ from pathlib import Path
 rtg_bin = Path("rtg") 
 
 def run_vcfeval(ref_sdf, 
-				baseline_vcf, 
-				call_vcf, 
-				out_dir,
-				bed_regions=None, 
-				evaluation_regions=None,
-				all_records=False,
+                baseline_vcf, 
+                call_vcf, 
+                out_dir,
+                bed_regions=None, 
+                evaluation_regions=None,
+                all_records=False,
                 ref_overlap=False, 
-				squash_ploidy=False,
-				sample=None,
-				score_field=None,
-				decompose=False,
-				ploidy=None,
-				output_mode=None,
-				flag_alternates=False,
-				threads=None,
-				memory=None):
+                squash_ploidy=False,
+                sample=None,
+                score_field=None,
+                decompose=False,
+                ploidy=None,
+                output_mode=None,
+                flag_alternates=False,
+                threads=None,
+                memory=None):
 	cmd = [rtg_bin]
 	if memory is not None:
 		cmd.append('RTG_MEM=' + memory)
