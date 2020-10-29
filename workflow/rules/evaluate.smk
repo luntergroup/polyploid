@@ -8,6 +8,8 @@ rule vcfeval:
 		calls_vcf_index="results/calls/{sample}.{library}.{depth}x.{reference}.{mapper}.{caller}.vcf.gz.tbi"
 	output:
 		directory("results/eval/{sample}.{library}.{depth}x.{reference}.{mapper}.{caller}.{filter}.{match}.vcfeval")
+	log:
+		"logs/eval/{sample}.{library}.{depth}x.{reference}.{mapper}.{caller}.{filter}.{match}.vcfeval.log"
 	params:
 		score_field=lambda wildcards: config["score_fields"][wildcards.caller],
 		ploidy=config["sample_ploidy"]*len(config["samples"]),
@@ -21,7 +23,7 @@ rule vcfeval:
 	conda:
 		"../envs/rtg.yaml"
 	shell:
-		"workflow/scripts/vcfeval.py \
+		"(workflow/scripts/vcfeval.py \
 			-t {input.reference} \
 			-b {input.baseline_vcf} \
 			--evaluation-regions {input.evaluation_regions} \
@@ -36,7 +38,8 @@ rule vcfeval:
 			{params.all_records} \
 			{params.squash_ploidy} \
 			{params.decompose} \
-			--rtg {params.rtg}"
+			--rtg {params.rtg} \
+			)2> {log}"
 
 rule install_starfish:
 	output:
