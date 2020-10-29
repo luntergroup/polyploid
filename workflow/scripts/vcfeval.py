@@ -118,10 +118,10 @@ def remove_vcf(vcf_filename, index=True):
     if index and vcf_index_exists(vcf_filename):
         remove_vcf_index(vcf_filename)
 
-def vcfeval_alleles_helper(ref, baseline, calls, out, bed_regions=None, evaluation_regions=None, sample=None, ploidy=None, all_records=False, decompose=False, threads=None, memory=None):
+def vcfeval_alleles_helper(ref, baseline, calls, out, bed_regions=None, evaluation_regions=None, sample=None, ref_overlap=False, ploidy=None, all_records=False, decompose=False, threads=None, memory=None):
 	normed_calls = calls.with_suffix('.norm.tmp' + str(random.randint(0, 1e5)) + '.vcf.gz')
 	decompose_multiallelic(calls, normed_calls)
-	run_vcfeval(ref, baseline, normed_calls, out, evaluation_regions=evaluation_regions, sample=sample, ploidy=ploidy, all_records=all_records, decompose=decompose, squash_ploidy=True, output_mode='annotate', flag_alternates=True, threads=threads, memory=memory)
+	run_vcfeval(ref, baseline, normed_calls, out, evaluation_regions=evaluation_regions, sample=sample, ref_overlap=ref_overlap, ploidy=ploidy, all_records=all_records, decompose=decompose, squash_ploidy=True, output_mode='annotate', flag_alternates=True, threads=threads, memory=memory)
 	split_baseline_annotated(out / 'baseline.vcf.gz', out / "tp-baseline.vcf.gz", out / "fn.vcf.gz")
 	split_calls_annotated(out / 'calls.vcf.gz', out / "tp.vcf.gz", out / "fp.vcf.gz")
 	remove_vcf(normed_calls)
@@ -146,6 +146,7 @@ def main(args):
                     evaluation_regions=args.evaluation_regions, \
                     sample=args.sample, \
                     all_records=args.all_records, \
+                    ref_overlap=args.ref_overlap, \
                     ploidy=args.ploidy, \
                     decompose=args.decompose, \
                     threads=args.threads, \
@@ -156,6 +157,7 @@ def main(args):
                     evaluation_regions=args.evaluation_regions, \
                     sample=args.sample, \
                     all_records=args.all_records, \
+                    ref_overlap=args.ref_overlap, \
                     ploidy=args.ploidy, \
                     decompose=args.decompose, \
                     output_mode=args.output_mode, \
