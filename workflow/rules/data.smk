@@ -235,9 +235,11 @@ rule make_truth_bed:
 		expand("data/truth/{sample}.{{reference}}.bed", sample=config["samples"])
 	output:
 		"data/truth/" + MIXED_SAMPLE + ".{reference}.bed"
+	params:
+		num_samples=str(len(config["samples"]))
 	conda:
 		"../envs/bedtools.yaml"
 	shell:
-		"bedtools multiinter -i {input} | cut -f 1,2,3 > {output}"
+		"bedtools multiinter -i {input} | awk '{if ($4=={params.num_samples}) print}' | cut -f 1,2,3 > {output}"
 
 localrules: make_truth_bed
