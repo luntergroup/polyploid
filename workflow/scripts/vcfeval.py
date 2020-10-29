@@ -5,6 +5,7 @@ import csv
 import pysam as ps
 import subprocess as sp
 from pathlib import Path
+import random
 
 rtg_bin = Path("rtg") 
 
@@ -118,7 +119,7 @@ def remove_vcf(vcf_filename, index=True):
         remove_vcf_index(vcf_filename)
 
 def vcfeval_alleles_helper(ref, baseline, calls, out, bed_regions=None, evaluation_regions=None, sample=None, ploidy=None, all_records=False, decompose=False, threads=None, memory=None):
-	normed_calls = calls.with_suffix('.norm.tmp.vcf.gz')
+	normed_calls = calls.with_suffix('.norm.tmp' + str(random.randint(0, 1e5)) + '.vcf.gz')
 	decompose_multiallelic(calls, normed_calls)
 	run_vcfeval(ref, baseline, normed_calls, out, evaluation_regions=evaluation_regions, sample=sample, ploidy=ploidy, all_records=all_records, decompose=decompose, squash_ploidy=True, output_mode='annotate', flag_alternates=True, threads=threads, memory=memory)
 	split_baseline_annotated(out / 'baseline.vcf.gz', out / "tp-baseline.vcf.gz", out / "fn.vcf.gz")
