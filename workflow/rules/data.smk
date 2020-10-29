@@ -240,6 +240,6 @@ rule make_truth_bed:
 	conda:
 		"../envs/bedtools.yaml"
 	shell:
-		"bedtools multiinter -i {input} | awk '{if ($4=={params.num_samples}) print}' | cut -f 1,2,3 > {output}"
+		"bedtools multiinter -i {input} | awk '{{if ($4=={params.num_samples}) print}}' | cut -f 1,2,3 > {output}"
 
 localrules: make_truth_bed
