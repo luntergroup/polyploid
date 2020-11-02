@@ -43,7 +43,7 @@ rule pbmm2_map:
 		"data/references/{reference}.fa",
 		"data/reads/raw/{sample}.{library}.{depth}x.fastq.gz"
 	output:
-		"data/reads/mapped/{sample}.{library}.{depth}x.{reference}.bwa.bam"
+		"data/reads/mapped/{sample}.{library}.{depth}x.{reference}.pbmm2.bam"
 	params:
 		rg=r"@RG\tID:{sample}\tSM:{sample}\tLB:{library}\tPU:PacBio"
 	log:
