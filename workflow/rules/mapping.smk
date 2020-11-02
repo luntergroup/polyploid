@@ -52,10 +52,10 @@ rule pbmm2_map:
 	conda:
 		"../envs/pbmm2.yaml"
 	shell:
-		"(pbmm2 align {input} -o {output} \
+		"(pbmm2 align {input} {output} \
 		--preset HIFI \
 		-j {threads} -J {threads} \
-		-rg {params.rg} \
+		--rg {params.rg} \
 		--sort) \
 		 2> {log}"
 
