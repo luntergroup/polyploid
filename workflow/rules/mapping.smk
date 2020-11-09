@@ -26,6 +26,7 @@ rule bwa_map:
 		"data/reads/mapped/{sample}.{library}.{depth}x.{reference}.bwa.bam"
 	params:
 		rg=r"@RG\tID:{sample}\tSM:{sample}\tLB:{library}\tPU:Illumina",
+		sort_threads=4,
 		sort_memory_per_thread="4G"
 	log:
 		"logs/bwa/{sample}.{library}.{depth}x.{reference}.log"
@@ -35,7 +36,7 @@ rule bwa_map:
 	shell:
 		"(bwa mem -t {threads} -R '{params.rg}' {input.fa} {input.fq1} {input.fq2} | \
 		  samtools view -bh | \
-		  samtools sort -@ {threads} -m {params.sort_memory_per_thread} -o {output}) \
+		  samtools sort -@ {params.sort_threads} -m {params.sort_memory_per_thread} -o {output}) \
 		 2> {log}"
 
 rule pbmm2_map:
@@ -45,7 +46,8 @@ rule pbmm2_map:
 	output:
 		"data/reads/mapped/{sample}.{library}.{depth}x.{reference}.pbmm2.bam"
 	params:
-		rg=r"@RG\tID:{sample}\tSM:{sample}\tLB:{library}\tPU:PacBio"
+		rg=r"@RG\tID:{sample}\tSM:{sample}\tLB:{library}\tPU:PacBio",
+		sort_threads=4
 	log:
 		"logs/pbmm2/{sample}.{library}.{depth}x.{reference}.log"
 	threads: 20
@@ -54,7 +56,8 @@ rule pbmm2_map:
 	shell:
 		"(pbmm2 align {input} {output} \
 		--preset HIFI \
-		-j {threads} -J {threads} \
+		-j {threads} \
+		-J {params.sort_threads} \
 		--rg {params.rg} \
 		--sort) \
 		 2> {log}"
