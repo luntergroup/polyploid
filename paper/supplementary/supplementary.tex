@@ -1,0 +1,84 @@
+\documentclass{article}
+
+\usepackage{fancyhdr} % Required for custom headers
+\usepackage{lastpage} % Required to determine the last page for the footer
+\usepackage{extramarks} % Required for headers and footers
+\usepackage{graphicx} % Required to insert images
+\usepackage[labelfont=bf, labelsep=space]{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{lipsum} % Used for inserting dummy 'Lorem ipsum' text into the template
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{titlesec}
+\usepackage{listings}
+\usepackage{booktabs}
+\usepackage{lscape}
+\usepackage{lipsum}
+\usepackage{courier}
+\usepackage{tabularx}
+\usepackage[colorlinks=true,linkcolor=black,anchorcolor=black,citecolor=black,menucolor=black,runcolor=black,urlcolor=black,bookmarks=true]{hyperref}
+\usepackage{longtable}
+\usepackage[numbers, super, sort&compress]{natbib}
+
+\renewcommand{\figurename}{Supplementary Figure}
+\renewcommand{\tablename}{Supplementary Table}
+
+% Margins
+\topmargin=-0.45in
+\evensidemargin=0in
+\oddsidemargin=0in
+\textwidth=6.5in
+\textheight=9.0in
+\headsep=0.25in 
+
+\setcounter{secnumdepth}{4}
+
+\titleformat{\paragraph}
+{\normalfont\normalsize\bfseries}{\theparagraph}{1em}{}
+\titlespacing*{\paragraph}
+{0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+
+\linespread{1.1} % Line spacing
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\lstset{basicstyle=\footnotesize\ttfamily,breaklines=true}
+\lstset{framextopmargin=50pt}
+
+\title{Benchmarking small-variant genotyping in polyploids: supplementary material}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\clearpage
+
+\section{Supplementary Tables and Figures}
+
+\clearpage
+
+\section{Supplementary Note 1. Data and software}
+
+\begin{itemize}
+    \item seqtk (1.3)
+    \item samtools (1.11)
+    \item bcftools (1.11)
+    \item BWA (0.7.17)
+    \item pbmm2 (1.4.0)
+    \item bedtools (2.29.2)
+    \item RTG Tools (3.12)
+    \item Octopus
+    \item GATK4 (4.2.0.0)
+    \item FreeBayes (1.3.5)
+\end{itemize}
+
+\bibliographystyle{naturemag}
+\bibliography{supplementary}
+
+\end{document} 
