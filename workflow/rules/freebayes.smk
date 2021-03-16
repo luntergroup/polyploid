@@ -3,14 +3,14 @@ rule freebayes_call:
 		reference="data/references/{reference}.fa",
 		bam="data/reads/mapped/{sample}.{library}.{depth}x.{reference}.{mapper}.bam",
 		bai="data/reads/mapped/{sample}.{library}.{depth}x.{reference}.{mapper}.bam.bai",
-		bed="data/references/{reference}.chromosomes.bed"
+		bed="data/references/{reference}.autosomes.bed"
 	output:
 		vcf="results/calls/{sample}.{library}.{depth}x.{reference}.{mapper}.FreeBayes.vcf.gz",
 		vcf_index="results/calls/{sample}.{library}.{depth}x.{reference}.{mapper}.FreeBayes.vcf.gz.tbi"
 	params:
 		ploidy=config["sample_ploidy"]*len(config["samples"]),
 		chunk_size=50000000,
-		other=config["caller_options"]["FreeBayes"]
+		other=config["caller_options"]["FreeBayes"] if "FreeBayes" in config["caller_options"] else ""
 	log:
 		"logs/freebayes/{sample}.{library}.{depth}x.{reference}.{mapper}.log"
 	benchmark:
@@ -24,6 +24,7 @@ rule freebayes_call:
 			 -f {input.reference} \
 			 -b {input.bam} \
 			 --ploidy {params.ploidy} \
+			 -= \
 			 {params.other} | \
 		bcftools filter \
 			 -i 'QUAL > 1 & GQ > 1 & SAF > 0 & SAR > 0' \

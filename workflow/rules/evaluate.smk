@@ -14,12 +14,13 @@ rule vcfeval:
 		score_field=lambda wildcards: config["score_fields"][wildcards.caller],
 		ploidy=config["sample_ploidy"]*len(config["samples"]),
 		all_records=lambda wildcards: "--all-records" if wildcards.filter=="raw" else "",
-		squash_ploidy=lambda wildcards: "--squash-ploidy" if wildcards.match=="AL" else "",
+		squash_ploidy=lambda wildcards: "--squash-ploidy" if wildcards.match in ["AL", "CB"] else "",
 		decompose=lambda wildcards: "--decompose" if wildcards.match=="AL" else "",
-		output_mode="split",
-		memory="40g",
-		rtg="workflow/tools/rtg-tools/rtg"
+		output_mode=lambda wildcards: "combine" if wildcards.match=="CB" else "split",
+		memory="40g"
 	threads: 20
+	resources:
+		mem_gb=40
 	conda:
 		"../envs/rtg.yaml"
 	shell:
@@ -34,46 +35,67 @@ rule vcfeval:
 			--ref-overlap \
 			--output-mode {params.output_mode} \
 			--threads {threads} \
-			--memory {params.memory} \
+			--memory {resources.mem_gb}g \
 			{params.all_records} \
 			{params.squash_ploidy} \
 			{params.decompose} \
-			--rtg {params.rtg} \
 			)2> {log}"
 
 rule install_starfish:
 	output:
 		"workflow/scripts/starfish.py"
+	params:
+		url="https://github.com/dancooke/starfish/raw/master/starfish.py"
 	shell:
-		"""
-		rm -rf starfish || 1
-		git clone https://github.com/dancooke/starfish
-		mv starfish/starfish.py {output}
-		rm -rf starfish
-		"""
+		"curl -L -o {output} {params.url}"
+localrules: install_starfish
+
+def _get_starfish_calls(wildcards):
+	res = []
+	for library, depth in config["runs"].items():
+		for caller in config["callers"]:
+			res.append("results/calls/" + wildcards.sample + "." + library + "." + str(depth) + "x." + wildcards.reference + "." + wildcards.mapper + "." + caller + ".vcf.gz")
+	return res
+
+def _get_starfish_labels(wildcards):
+	res = []
+	for library in config["runs"].keys():
+		for caller in config["callers"]:
+			res.append(caller + "." + library)
+	return res
 
 rule starfish:
 	input:
 		starfish="workflow/scripts/starfish.py",
 		reference="data/references/{reference}.sdf",
-		calls=expand("results/calls/{{sample}}.{{library}}.{{depth}}x.{{reference}}.{{mapper}}.{caller}.vcf.gz", caller=config["callers"])
+		calls=_get_starfish_calls
 	output:
-		"results/eval/{sample}.{library}.{depth}x.{reference}.{mapper}.{filter}.{match}.isec"
+		directory("results/eval/{sample}.{reference}.{mapper}.{filter}.{match}.isec")
 	params:
 		ploidy=config["sample_ploidy"]*len(config["samples"]),
 		all_records=lambda wildcards: "--all-records" if wildcards.filter=="raw" else "",
 		squash_ploidy=lambda wildcards: "--squash-ploidy" if wildcards.match=="AL" else "",
-		decompose=lambda wildcards: "--decompose" if wildcards.match=="AL" else ""
+		decompose=lambda wildcards: "--decompose" if wildcards.match=="AL" else "",
+		names=_get_starfish_labels
+	log:
+		"logs/eval/{sample}.{reference}.{mapper}.{filter}.{match}.isec.log"
+	threads: 20
+	resources:
+		mem_gb=40
 	conda:
 		"../envs/rtg.yaml"
 	shell:
-		"{input.starfish} \
+		"(python {input.starfish} \
 		 -t {input.reference} \
 		 -V {input.calls} \
 		 -O {output} \
 		 --ref-overlap \
 		 --ploidy {params.ploidy} \
+		 --names {params.names} \
 		 --threads {threads} \
+		 --memory {resources.mem_gb}g \
 		 {params.all_records} \
 		 {params.squash_ploidy} \
-		 {params.decompose}"
+		 {params.decompose} \
+		 --verbose \
+		 )2> {log}"

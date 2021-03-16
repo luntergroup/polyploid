@@ -1,0 +1,20 @@
+reference: musa_acuminata
+samples: 
+    - banana
+sample_ploidy: 3
+runs:
+    HiSeq: 55
+    NextSeq: 65
+mapper: bwa
+callers:
+    - Octopus
+    - GATK4
+    - FreeBayes
+caller_options:
+    Octopus: ""
+    GATK4: ""
+    FreeBayes: "-="
+score_fields:
+    Octopus: GQ
+    GATK4: GQ
+    FreeBayes: GQ
