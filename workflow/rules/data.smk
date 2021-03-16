@@ -32,25 +32,41 @@ rule download_musa_acuminata_fasta:
 
 localrules: download_musa_acuminata_fasta
 
+rule generate_hs38DH_autosomes_bed:
+	input:
+		"data/references/hs38DH.fa.fai"
+	output:
+		"data/references/hs38DH.autosomes.bed"
+	shell:
+		"head -22 {input} | awk -v OFS='\t' '{{print $1,0,$2}}' > {output}"
+		
 rule generate_hs38DH_chromosomes_bed:
 	input:
 		"data/references/hs38DH.fa.fai"
 	output:
 		"data/references/hs38DH.chromosomes.bed"
 	shell:
-		"head -23 {input} | awk -v OFS='\t' '{{print $1,0,$2}}' > {output}"
+		"head -25 {input} | awk -v OFS='\t' '{{print $1,0,$2}}' > {output}"
 
+rule generate_GRCh38_autosomes_bed:
+	input:
+		"data/references/GRCh38.fa.fai"
+	output:
+		"data/references/GRCh38.autosomes.bed"
+	shell:
+		"head -22 {input} | awk -v OFS='\t' '{{print $1,0,$2}}' > {output}"
+		
 rule generate_GRCh38_chromosomes_bed:
 	input:
 		"data/references/GRCh38.fa.fai"
 	output:
 		"data/references/GRCh38.chromosomes.bed"
 	shell:
-		"head -23 {input} | awk -v OFS='\t' '{{print $1,0,$2}}' > {output}"
+		"head -25 {input} | awk -v OFS='\t' '{{print $1,0,$2}}' > {output}"
 
-localrules: download_hs38DH, download_GRCh38, generate_hs38DH_chromosomes_bed, generate_GRCh38_chromosomes_bed
+localrules: download_hs38DH, download_GRCh38, generate_hs38DH_autosomes_bed, generate_hs38DH_chromosomes_bed, generate_GRCh38_autosomes_bed, generate_GRCh38_chromosomes_bed
 
-rule generate_musa_acuminata_bed:
+rule generate_musa_acuminata_chromosomes_bed:
 	input:
 		"data/references/musa_acuminata.fa.fai"
 	output:
@@ -58,7 +74,15 @@ rule generate_musa_acuminata_bed:
 	shell:
 		"head -11 {input} | awk -v OFS='\t' '{{print $1,0,$2}}' > {output}"
 
-localrules: generate_musa_acuminata_bed
+rule generate_musa_acuminata_autosome_bed:
+	input:
+		"data/references/musa_acuminata.fa.fai"
+	output:
+		"data/references/musa_acuminata.autosomes.bed"
+	shell:
+		"head -11 {input} | awk -v OFS='\t' '{{print $1,0,$2}}' > {output}"
+
+localrules: generate_musa_acuminata_chromosomes_bed, generate_musa_acuminata_autosome_bed
 
 import re
 
@@ -144,7 +168,7 @@ rule download_banana_hiseq_reads:
 
 rule download_banana_nextseq_reads:
 	output:
-		"data/reads/raw/banana.NextSeq.55x.{strand}.fastq.gz"
+		"data/reads/raw/banana.NextSeq.65x.{strand}.fastq.gz"
 	params:
 		bucket_url = "ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR341",
 		run_accessions = [("ERR3413471", "001"), ("ERR3413472", "002"), ("ERR3413473", "003"), ("ERR3413474", "004")],
@@ -154,14 +178,19 @@ rule download_banana_nextseq_reads:
 
 localrules: download_banana_hiseq_reads, download_banana_nextseq_reads
 
-MAX_DEPTH = str(int(config["sample_depth"]) * len(config["samples"]))
-MIXED_SAMPLE = '+'.join(config["samples"]) if len(config["samples"]) > 1 else "DUMMY"
+if config["samples"][0] != "banana":
+	SAMPLE_DEPTH = int(config["sample_depth"])
+	MAX_DEPTH = str(SAMPLE_DEPTH * len(config["samples"]))
+else:
+	SAMPLE_DEPTH = 0
+	MAX_DEPTH = 0
+MIXED_SAMPLE = '+'.join(config["samples"])
 
 rule mix_paired_reads:
 	input:
-		expand("data/reads/raw/{sample}.{{library}}." + str(config["sample_depth"]) + "x.{{strand}}.fastq.gz", sample=config["samples"])
+		expand("data/reads/raw/{sample}.{{library}}." + str(SAMPLE_DEPTH) + "x.{{strand}}.fastq.gz", sample=config["samples"])
 	output:
-		"data/reads/raw/" + MIXED_SAMPLE + ".{library}." + MAX_DEPTH + "x.{strand}.fastq.gz"
+		"data/reads/raw/" + MIXED_SAMPLE + ".{library}." + str(MAX_DEPTH) + "x.{strand}.fastq.gz"
 	shell:
 		"cat {input} > {output}"
 
@@ -169,9 +198,9 @@ localrules: mix_paired_reads
 
 rule mix_reads:
 	input:
-		expand("data/reads/raw/{sample}.{{library}}." + str(config["sample_depth"]) + "x.fastq.gz", sample=config["samples"])
+		expand("data/reads/raw/{sample}.{{library}}." + str(SAMPLE_DEPTH) + "x.fastq.gz", sample=config["samples"])
 	output:
-		"data/reads/raw/" + MIXED_SAMPLE + ".{library}." + MAX_DEPTH + "x.fastq.gz"
+		"data/reads/raw/" + MIXED_SAMPLE + ".{library}." + str(MAX_DEPTH) + "x.fastq.gz"
 	shell:
 		"cat {input} > {output}"
 
@@ -201,8 +230,8 @@ rule downsample_fastq:
 	conda:
 		"../envs/seqtk.yaml"
 	shell:
-		"seqtk sample {input} \
-		 <(bc<<<'scale=10; {wildcards.depth}/{params.max_depth}') \
+		"bc<<<'scale=10; {wildcards.depth}/{params.max_depth}' | \
+		 xargs -I{{}} seqtk sample {input} {{}} \
 		 | gzip > {output}"
 
 def read_sample_name(vcf_filename):

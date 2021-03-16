@@ -1,0 +1,16 @@
+reference: hs38DH
+samples:
+    - HG003
+    - HG004
+sample_ploidy: 2
+sample_depth: 35
+library: NovaSeq
+mapper: bwa
+depths:
+    - 30
+callers:
+    - Octopus_longhaps
+caller_options:
+    Octopus_longhaps: ""
+score_fields:
+    Octopus_longhaps: GQ

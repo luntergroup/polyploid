@@ -8,17 +8,19 @@ include: "rules/evaluate.smk"
 
 localrules: all
 
-BANANA = config["samples"][0] == "banana"
-
 rule all:
 	input:
-		expand("results/eval/{sample}.{library}.{depth}x.{reference}.{mapper}{caller}.{filter}.{match}.{eval}", \
-			  sample='+'.join(config["samples"]), \
-              library=config["library"], \
-              depth=config["depths"], \
-              reference=config["reference"], \
-              mapper=config["mapper"], \
-              caller=[""] if BANANA else ["." + caller for caller in config["callers"]], \
-              filter=["pass", "raw"], \
-              match=["GT", "AL"], \
-			  eval=["isec"] if BANANA else ["vcfeval"])
+		expand("results/eval/{sample}.{library}.{depth}x.{reference}.{mapper}.{caller}.{filter}.{match}.vcfeval", \
+			   sample='+'.join(config["samples"]), \
+			   library=config["library"] if "library" in config else [], \
+			   depth=config["depths"] if "depths" in config else [], \
+			   reference=config["reference"], \
+			   mapper=config["mapper"], \
+			   caller=config["callers"], \
+			   filter=["pass", "raw"], \
+			   match=["GT", "AL", "CB"]),
+		expand("results/eval/banana.{reference}.{mapper}.{filter}.{match}.isec", \
+			   reference=config["reference"], \
+			   mapper=config["mapper"], \
+			   filter=["pass", "raw"] if "library" not in config else [], \
+			   match=["GT", "AL"])

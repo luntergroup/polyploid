@@ -41,13 +41,13 @@ rule gatk_call:
 		bai=rules.gatk_mark_duplicates.output.bai,
 		reference="data/references/{reference}.fa",
 		reference_dict="data/references/{reference}.dict",
-		bed="data/references/{reference}.chromosomes.bed"
+		bed="data/references/{reference}.autosomes.bed"
 	output:
 		vcf="results/calls/{sample}.{library}.{depth}x.{reference}.{mapper}.GATK4.raw.vcf.gz",
 		vcf_index="results/calls/{sample}.{library}.{depth}x.{reference}.{mapper}.GATK4.raw.vcf.gz.tbi"
 	params:
 		ploidy=config["sample_ploidy"]*len(config["samples"]),
-		other=config["caller_options"]["GATK4"]
+		other=config["caller_options"]["GATK4"] if "GATK4" in config["caller_options"] else ""
 	log:
 		"logs/gatk/{sample}.{library}.{depth}x.{reference}.{mapper}.dedup.raw.log"
 	benchmark:

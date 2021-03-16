@@ -6,5 +6,5 @@ channels:
 dependencies:
     - tabix=0.2.6
     - bcftools=1.11
-    - gatk4=4.1.9.0
+    - gatk4=4.2.0.0
     - python=3.9.0

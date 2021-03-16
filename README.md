@@ -24,7 +24,7 @@ Install Snakemake and general dependencies with conda:
 $ conda config --add channels defaults
 $ conda config --add channels bioconda
 $ conda config --add channels conda-forge
-$ conda create --name polyploid snakemake pysam python-wget
+$ conda create --name polyploid snakemake pysam python-wget openpyxl
 $ conda activate polyploid
 ```
 

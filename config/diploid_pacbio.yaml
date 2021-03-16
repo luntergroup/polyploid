@@ -12,9 +12,7 @@ callers:
     - GATK4
     - FreeBayes
 caller_options:
-    Octopus: "--max-genotypes 20000 --disable-early-phase-detection"
-    GATK4: ""
-    FreeBayes: "-="
+    Octopus: "--config /opt/octopus/resources/configs/PacBioCCS.config"
 score_fields:
     Octopus: RFGQ
     GATK4: GQ
