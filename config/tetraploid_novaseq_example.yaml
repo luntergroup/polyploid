@@ -1,0 +1,23 @@
+reference: hs38DH
+samples:
+    - HG003
+    - HG004
+sample_ploidy: 2
+sample_depth: 35
+library: NovaSeq
+mapper: bwa
+depths:
+    - 30
+    - 70
+callers:
+    - Octopus
+    - GATK4
+    - FreeBayes
+caller_options:
+    Octopus: "--max-genotypes 20000 --disable-early-phase-detection"
+    GATK4: ""
+    FreeBayes: "-="
+score_fields:
+    Octopus: RFGQ
+    GATK4: GQ
+    FreeBayes: GQ
