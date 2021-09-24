@@ -4,6 +4,6 @@ channels:
     - conda-forge
     - defaults
 dependencies:
-    - tabix=0.2.6
-    - samtools=1.11
-    - bcftools=1.11
+    - tabix=1.11
+    - samtools=1.13
+    - bcftools=1.13

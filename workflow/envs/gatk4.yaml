@@ -4,7 +4,7 @@ channels:
     - conda-forge
     - defaults
 dependencies:
-    - tabix=0.2.6
-    - bcftools=1.11
+    - tabix=1.11
+    - bcftools=1.13
     - gatk4=4.2.0.0
     - python=3.9.0
