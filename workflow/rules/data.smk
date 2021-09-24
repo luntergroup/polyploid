@@ -86,6 +86,24 @@ localrules: generate_musa_acuminata_chromosomes_bed, generate_musa_acuminata_aut
 
 import re
 
+def _get_ajtrio_giab_prefix(sample, reference):
+	base_url = "ftp://ftp-trace.ncbi.nlm.nih.gov//giab/ftp/release/AshkenazimTrio"
+	subdirs = {
+		"HG002": "HG002_NA24385_son",
+		"HG003": "HG003_NA24149_father",
+		"HG004": "HG004_NA24143_mother",
+	}
+	giab_version = "NISTv4.2.1"
+	if reference == "hs38DH":
+		reference = "GRCh38"
+	return f"{base_url}/{subdirs[sample]}/{giab_version}/{reference}/{sample}_{reference}_1_22_v4.2.1_benchmark"
+
+def _get_ajtrio_giab_vcf_url(wildcards):
+	return _get_ajtrio_giab_prefix(wildcards.sample, wildcards.reference) + ".vcf.gz"
+
+def _get_ajtrio_giab_bed_url(wildcards):
+	return _get_ajtrio_giab_prefix(wildcards.sample, wildcards.reference) + "_noinconsistent.bed"
+
 rule download_giab:
 	output:
 		vcf="data/truth/{sample}.{reference}.vcf.gz",
@@ -94,12 +112,13 @@ rule download_giab:
 	wildcard_constraints:
 		sample='|'.join([re.escape(s) for s in ["HG002", "HG003", "HG004"]])
 	params:
-		url_prefix="ftp://ftp-trace.ncbi.nlm.nih.gov//giab/ftp/data/AshkenazimTrio/analysis/NIST_v4.2_SmallVariantDraftBenchmark_07092020"
+		vcf_url=_get_ajtrio_giab_vcf_url,
+		bed_url=_get_ajtrio_giab_bed_url
 	shell:
 		"""
-		curl -o {output.vcf} {params.url_prefix}/{wildcards.sample}_GRCh38_1_22_v4.2_benchmark.vcf.gz
-		curl -o {output.vcf_index} {params.url_prefix}/{wildcards.sample}_GRCh38_1_22_v4.2_benchmark.vcf.gz.tbi
-		curl -o {output.bed} {params.url_prefix}/{wildcards.sample}_GRCh38_1_22_v4.2_benchmark.bed
+		curl -o {output.vcf} {params.vcf_url}
+		curl -o {output.vcf_index} {params.vcf_url}.tbi
+		curl -o {output.bed} {params.bed_url}
 		"""
 
 localrules: download_giab
