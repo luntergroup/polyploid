@@ -4,8 +4,8 @@ channels:
     - conda-forge
     - defaults
 dependencies:
-    - tabix=0.2.6
-    - bcftools=1.11
+    - tabix=1.11
+    - bcftools=1.13
     - python=3.8.0
     - pysam=0.16.0.1
-    - rtg-tools=3.12
+    - rtg-tools=3.12.1
