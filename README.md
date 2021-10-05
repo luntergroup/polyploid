@@ -38,7 +38,7 @@ $ echo "\t\t-<link_here>\n\t\t-<link_here>" >> config/tetraploid_novaseq.yaml
 Then run each experiment as required, e.g:
 
 ```shell
-$ snakemake --configfile config/tetraploid_novaseq.yaml --use-conda -j 100 --cluster "qsub -cwd -V -j y -P mygroup.prj -q long.qf -pe shmem {threads}"
+$ snakemake --configfile config/tetraploid_novaseq.yaml --use-conda --use-singularity -j 100 --cluster "qsub -cwd -V -j y -P mygroup.prj -q long.qf -pe shmem {threads}"
 ```
 
 
