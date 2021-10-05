@@ -26,7 +26,7 @@ rule download_musa_acuminata_fasta:
 	output:
 		"data/references/musa_acuminata.fa"
 	params:
-		url = "https://banana-genome-hub.southgreen.fr/sites/banana-genome-hub.southgreen.fr/files/data/fasta/version2/musa_acuminata_v2_pseudochromosome.fna"
+		url = "https://banana-genome-hub.southgreen.fr/filebrowser/download/42948"
 	shell:
 		"curl -o {output} {params.url}"
 
