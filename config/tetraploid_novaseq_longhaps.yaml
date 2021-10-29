@@ -14,3 +14,5 @@ caller_options:
     Octopus_longhaps: ""
 score_fields:
     Octopus_longhaps: GQ
+stratifications:
+    - genome

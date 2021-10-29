@@ -9,18 +9,19 @@ include: "rules/evaluate.smk"
 localrules: all
 
 rule all:
-	input:
-		expand("results/eval/{sample}.{library}.{depth}x.{reference}.{mapper}.{caller}.{filter}.{match}.vcfeval", \
-			   sample='+'.join(config["samples"]), \
-			   library=config["library"] if "library" in config else [], \
-			   depth=config["depths"] if "depths" in config else [], \
-			   reference=config["reference"], \
-			   mapper=config["mapper"], \
-			   caller=config["callers"], \
-			   filter=["pass", "raw"], \
-			   match=["GT", "AL", "CB"]),
-		expand("results/eval/banana.{reference}.{mapper}.{filter}.{match}.isec", \
-			   reference=config["reference"], \
-			   mapper=config["mapper"], \
-			   filter=["pass", "raw"] if "library" not in config else [], \
-			   match=["GT", "AL"])
+    input:
+        expand("results/eval/{sample}.{library}.{depth}x.{reference}.{mapper}.{caller}.{filter}.{match}.{stratification}.vcfeval", \
+               sample='+'.join(config["samples"]), \
+               library=config["library"] if "library" in config else [], \
+               depth=config["depths"] if "depths" in config else [], \
+               reference=config["reference"], \
+               mapper=config["mapper"], \
+               caller=config["callers"], \
+               filter=["pass", "raw"], \
+               match=["GT", "AL", "CB"], \
+               stratification=config["stratifications"]),
+        expand("results/eval/banana.{reference}.{mapper}.{filter}.{match}.isec", \
+               reference=config["reference"], \
+               mapper=config["mapper"], \
+               filter=["pass", "raw"] if "library" not in config else [], \
+               match=["GT", "AL"])

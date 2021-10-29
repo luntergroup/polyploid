@@ -30,3 +30,11 @@ score_fields:
     Octopus: RFGQ
     GATK4: GQ
     FreeBayes: GQ
+stratifications:
+    - genome
+    - alldifficult
+    - alllowmapandsegdup
+    - notinalldifficult
+    - notinalllowmapandsegdup
+    - AllTandemRepeatsandHomopolymers
+    - notinAllTandemRepeatsandHomopolymers

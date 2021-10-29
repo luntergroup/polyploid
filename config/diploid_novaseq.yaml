@@ -18,6 +18,14 @@ caller_options:
     GATK4: ""
     FreeBayes: ""
 score_fields:
-    Octopus: RFGQ
+    Octopus: GQ
     GATK4: GQ
     FreeBayes: GQ
+stratifications:
+    - genome
+    - alldifficult
+    - alllowmapandsegdup
+    - notinalldifficult
+    - notinalllowmapandsegdup
+    - AllTandemRepeatsandHomopolymers
+    - notinAllTandemRepeatsandHomopolymers
